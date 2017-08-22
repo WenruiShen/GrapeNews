@@ -1,0 +1,9 @@
+.idea/
+*.log
+node_modules/
+BAK/
+gungnir/__pycache__/
+dataCollector/__pycache__/
+dataCollector/migrations/__pycache__/
+gungirRest/__pycache__/
+gungirRest/migrations/__pycache__/

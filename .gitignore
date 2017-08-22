@@ -1,0 +1,8 @@
+.idea/
+*.log
+node_modules/
+gungnir/dataCollector/migrations/0002_auto_20170713_0211.py
+gungnir/accounts/__pycache__
+gungnir/accounts/migrations/__pycache__
+gungnir/accounts/migrations/0001_initial.py
+gungnir/dataCollector/migrations/0001_initial.py

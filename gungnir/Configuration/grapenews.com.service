@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve the Django Grape_News application
+After=network.target
+
+[Service]
+User=gungnir_user
+Group=www-data
+WorkingDirectory=/home/gungnir_user/gungnir_env/Gungnir_mvp/Gungnir-Repo/gungnir
+ExecStart=/usr/local/bin/gunicorn gungnir.wsgi:application --bind 127.0.0.1:8000
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

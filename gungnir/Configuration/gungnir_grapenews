@@ -1,0 +1,44 @@
+server {
+	charset utf-8;
+	listen 80;
+	server_name csi6220-2-vm2.ucd.ie;
+
+	location /static {
+		alias /home/gungnir_user/gungnir_env/Gungnir_mvp/Gungnir-Repo/gungnir/static/;
+	}
+	
+	location / {
+		proxy_set_header Host $host;
+		proxy_pass http://127.0.0.1:8000/;
+	}
+}
+
+server {
+	charset utf-8;
+	listen 80;
+	server_name ucdgrapenews.com;
+
+	location /static {
+		alias /home/gungnir_user/gungnir_env/Gungnir_mvp/Gungnir-Repo/gungnir/static/;
+	}
+
+	location / {
+		proxy_set_header Host $host;
+		proxy_pass http://127.0.0.1:8000/;
+	}
+}
+
+server {
+	charset utf-8;
+	listen 80;
+	server_name www.ucdgrapenews.com;
+
+	location /static {
+		alias /home/gungnir_user/gungnir_env/Gungnir_mvp/Gungnir-Repo/gungnir/static/;
+	}
+
+	location / {
+		proxy_set_header Host $host;
+		proxy_pass http://127.0.0.1:8000/;
+	}
+}
