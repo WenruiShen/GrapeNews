@@ -164,7 +164,8 @@ class topics:
                 for title in titles:
                     title_words = []
                     a1 = re.compile(r'\([^}]*\)') #remove string in brackets
-                    re_title = a1.sub('', title)
+                    title_1 = title.replace('\u2013', ' ')  # remove '-'
+                    re_title = a1.sub('', title_1)
                     clean_title = remove.removePunctuation(re_title)
                     #clean_title = remove.removestopword(f_title)
                     if clean_title is None:
