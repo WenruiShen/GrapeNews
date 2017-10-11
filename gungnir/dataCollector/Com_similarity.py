@@ -209,6 +209,7 @@ def f_k_means_test(news_terms_ndarray, news_terms, K_num):
 
 
 class Com_similarity:
+    # Tokenizer function
     def lemma_tokenizer_v2(ori_news_list):
         # use the standard scikit-learn tokenizer first
         standard_tokenizer = CountVectorizer().build_tokenizer()
@@ -223,6 +224,7 @@ class Com_similarity:
                     lemma_tokens.append(lemma_token)
         return lemma_tokens
 
+    # Statistic K-Means find one representative news in each cluster
     def relevent_detection(self, news_obj_list):
         try:
             news_documents = []
@@ -289,6 +291,7 @@ class Com_similarity:
             logger.error(e)
             return None
 
+    # Dynamic K-Means find one representative news in each cluster
     def dynamic_relevent_detection(self, news_obj_list):
         try:
             news_documents = []

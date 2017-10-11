@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger('dataCollector')
 
 class Remove:
+    # Remove sectional Punctuation from topic
     def removePunctuation(self, text):
         try:
             punctuation = '!,;:?"'
@@ -16,6 +17,7 @@ class Remove:
             logger.error("Remove.removePunctuation failed: " + str(e))
             return text
 
+    # Remove stop words and some Punctuation from word
     def removestopword(self, text):
         try:
             stop_words = set(stopwords.words('english'))

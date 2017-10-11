@@ -16,67 +16,6 @@ import dataCollector.Detect_title
 
 logger = logging.getLogger('dataCollector')
 
-# test_1
-@shared_task
-def add(x, y):
-    return x + y
-
-# test_2
-@shared_task
-def mul(x, y):
-    return x * y
-
-# test_3
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
-
-# test Ctime functuion
-@shared_task
-def test_time():
-    a = dataCollector.Ctime.C_times()
-    latest_update = str(datetime.datetime.now())[0:10] + "T00:00:00.000Z"
-    test = "2017-06-22T01:51:42.000Z"
-    r = a.Ctoday(test, latest_update)
-    logger.debug(r)
-
-@shared_task
-def test_ABC():
-    abc = dataCollector.Past_news.ALL_news()
-    x = "trump usa"
-    Anews, Atimes, Atitles, Aurl, Anews_image = abc.ABC_news_search_get(x, 0, "2008-09-26T01:53:42.000Z")
-    #Aurl,  Atimes = abc.ABC_news_search_get(x, 0, "2008-09-26T01:53:42.000Z")
-    logger.debug(Atimes)
-    logger.debug(Atitles)
-    #logger.debug(abc.ABC_news_search_get(x, 0, "2008-09-26T01:53:42.000Z"))
-
-@shared_task
-def test_BBC():
-    bbc = dataCollector.Past_news.ALL_news()
-    x = "trump"
-    #Bnews, Btimes, Btitles, Burl, Bnews_image = bbc.BBC_news_search_get(x, 1, "2008-09-26T01:53:42.000Z")
-    bbc.BBC_news_search_get(x, 1, "2008-09-26T01:53:42.000Z")
-    #logger.debug(bbc.BBC_news_search_get(x, 1, "2008-09-26T01:53:42.000Z"))
-
-@shared_task
-def test_CNN():
-    abc = dataCollector.Past_news.ALL_news()
-    x = "trump usa"
-    Anews, Atimes, Atitles, Aurl, Anews_image = abc.CNN_news_search_get(x, 1, "2008-09-26T01:53:42.000Z")
-    #Aurl,  Atimes = abc.ABC_news_search_get(x, 0, "2008-09-26T01:53:42.000Z")
-    #logger.debug(Atimes)
-    #logger.debug(Atitles)
-
-def test_wiki(N_day):
-    try:
-        A = dataCollector.get_topics.topics()
-        raw = A.get_response(N_day)
-        #logger.debug(raw)
-        topic_list = A.pares_raw_data_2(raw)
-    except Exception as e:
-        logger.error("test_wiki failed: " + str(e))
-
-
 ############################################################################
 ############################################################################
 # insert static topic list
@@ -96,8 +35,9 @@ def insert_one_day_hot_Wiki_topic(N_day):
     try:
         A = dataCollector.get_topics.topics()
         raw = A.get_response(N_day)
-        #logger.debug(raw)
-        topic_list = A.pares_raw_data_2(raw)
+        #logger.debug(str(raw))
+        topic_list = A.pares_raw_data_3(raw)
+        time.sleep(5)
         if topic_list is None:
             return
         if len(topic_list) >= 1:
@@ -114,11 +54,11 @@ def insert_one_day_hot_Wiki_topic(N_day):
 # insert N_days dynamic topic from wikipedia portal current events
 @shared_task
 def insert_N_days_hot_Wiki_topics(N_days):
-    for N_day in range(N_days-1, -1, -1):
+    for N_day in range(N_days-1, 0, -1):
         insert_one_day_hot_Wiki_topic(N_day)
 
 
-# get All topic function V1.0
+# get All topic from topic table function V1.0
 @shared_task
 def get_topic():
     start_id = 1
@@ -140,7 +80,7 @@ def get_topic():
         logger.error("get_topic failed: " + str(e))
         return None, None, None
 
-# get all topic function V2.0
+# get all topic from topic table function V2.0
 @shared_task
 def get_topic_V2():
     topic_id = []
@@ -182,14 +122,17 @@ def get_latest_topic():
         return  None, None
 
 
-# add_daily news from BBC and NYT V2.0
+# add_daily news from BBC CNN ABC and NYT V2.0
 @shared_task
 def add_daily_processing():
     try:
+        # Get all topic from topic table
         All_topic, All_time, All_id = get_topic_V2()
         b = dataCollector.Past_news.ALL_news()
+        # Processed each topic (remove stopwords)
         remove = dataCollector.remove_Punctuation.Remove()
         if All_topic is not None:
+            # generate today's zero time such as 2017.7.20.00:00:00.000Z
             now_time = dateutil.parser.parse(str(datetime.datetime.now())[0:11] + "00:00:00.000Z")
             yes_time = now_time + datetime.timedelta(days=-3)
             yes_time_nyr = yes_time.strftime('%Y%m%d')
@@ -202,6 +145,7 @@ def add_daily_processing():
                 url_list = []
                 image_list = []
                 temple = y
+                # judge latest update
                 if (temple == "None"):
                     latest_update = str(datetime.datetime.now())[0:10] + "T00:00:00.000Z"
                 else:
@@ -217,6 +161,7 @@ def add_daily_processing():
                 # retrive 2 pages for today.
                 for p in range(1, 3):
                     #logger.debug("\tPage:%d" % p)
+                    # BBC extraction
                     if BBC_empty_mark is 0:
                         Bnews_content, Bnews_summary, Btimes, Btitles, Burl, Bnews_image = b.BBC_news_search_get(clear_x, p, latest_update)
                         if len(Bnews_content) is not 0:
@@ -231,6 +176,7 @@ def add_daily_processing():
                             BBC_empty_mark = 1
                         #logger.debug("\tBBC done")
 
+                    # ABC extraction
                     if ABC_empty_mark is 0:
                         Anews_content, Anews_summary, Atimes, Atitles, Aurl, Anews_image = b.ABC_news_search_get(clear_x, p-1, latest_update)
                         if len(Anews_content) is not 0:
@@ -245,6 +191,7 @@ def add_daily_processing():
                             ABC_empty_mark = 1
                         #logger.debug("\tABC done")
 
+                    # CNN extraction
                     if CNN_empty_mark is 0:
                         Cnews_content, Cnews_summary, Ctimes, Ctitles, Curl, Cnews_image = b.CNN_news_search_get(str(clear_x), p, latest_update)
                         if len(Cnews_content) is not 0:
@@ -260,6 +207,7 @@ def add_daily_processing():
                         #logger.debug("\tCNN done")
 
 
+                    # NYT extraction
                     if NYT_empty_mark is 0:
                         Nnews_content, Nnews_summary, Ntimes, Ntitles, Nurl, Nnews_image = b.NYT_news_search_get(clear_x, (p-1), latest_update)
                         if len(Nnews_content) is not 0:
@@ -273,6 +221,7 @@ def add_daily_processing():
                             # Can not get data from NYT.
                             NYT_empty_mark = 1
                         #logger.debug("\tNYT done")
+
                     # Deply for avoiding http request too frequently;
                     #time.sleep(0.3)
 
@@ -297,6 +246,7 @@ def add_daily_processing():
                     filter_image_list.append(image_list[res_index])
 
                 logger.info("\t[Get daily news] ori_num:" + str(ori_len) + ";\tfilter_num:"+ str(len(filter_news_content_list)) )
+                # Insert daily news into original news table
                 for content, summary, times, title, url, image in zip(filter_news_content_list, filter_news_summary_list, filter_time_list, filter_title_list, filter_url_list, filter_image_list):
                     Model_Interfaces.db2_add_one_ori_news(dateutil.parser.parse(times), str(title), str(content), str(summary), str(z), str(url), str(image))
     except Exception as e:
@@ -306,11 +256,14 @@ def add_daily_processing():
 @shared_task
 def add_history_processing(history_days):
     try:
+        # Get latest topic
         topic_name_list, All_id = get_latest_topic()
         b = dataCollector.Past_news.ALL_news()
+        # Process topic (Remove stopwords)
         remove = dataCollector.remove_Punctuation.Remove()
         if topic_name_list is not None:
             now_time = dateutil.parser.parse(str(datetime.datetime.now())[0:11] + "00:00:00.000Z")
+            # Generate history start time
             start_date = now_time + datetime.timedelta(days=-history_days)
             start_date_nyr = start_date.strftime('%Y%m%d')
             for x, z in zip(topic_name_list, All_id):
@@ -331,6 +284,7 @@ def add_history_processing(history_days):
                 # retrive max 10 pages for history.
                 for p in range(1, 10):
                     logger.debug("\tPage:%d" % p)
+                    # BBC extraction
                     if BBC_empty_mark is 0:
                         Bnews_content, Bnews_summary, Btimes, Btitles, Burl, Bnews_image = b.BBC_news_search_get(str(clear_x), p, str(start_date))
                         if len(Bnews_content) is not 0:
@@ -346,6 +300,7 @@ def add_history_processing(history_days):
                     logger.debug("\tBBC done")
 
                     '''
+                    # ABC extraction
                     if ABC_empty_mark is 0:
                         Anews_content, Anews_summary, Atimes, Atitles, Aurl, Anews_image = b.ABC_news_search_get(clear_x, p-1, str(start_date))
                         if len(Anews_content) is not 0:
@@ -361,6 +316,7 @@ def add_history_processing(history_days):
                     logger.debug("\tABC done")
                     '''
 
+                    # CNN extraction
                     if CNN_empty_mark is 0:
                         Cnews_content, Cnews_summary, Ctimes, Ctitles, Curl, Cnews_image = b.CNN_news_search_get(str(clear_x), p, str(start_date))
                         if len(Cnews_content) is not 0:
@@ -375,6 +331,7 @@ def add_history_processing(history_days):
                             CNN_empty_mark = 1
                         logger.debug("\tCNN done")
 
+                    # NYT extraction
 
                     if NYT_empty_mark is 0:
                         Nnews_content, Nnews_summary, Ntimes, Ntitles, Nurl, Nnews_image = b.NYT_news_search_get(str(clear_x), (p-1), str(start_date))
@@ -415,6 +372,7 @@ def add_history_processing(history_days):
                     filter_image_list.append(image_list[res_index])
 
                 logger.info("\t[Get history news] ori_num:" + str(ori_len) + ";\tfilter_num:"+ str(len(filter_news_content_list)) )
+                # Insert history news into original news table
                 for content, summary, times, title, url, image in zip(filter_news_content_list, filter_news_summary_list, filter_time_list, filter_title_list, filter_url_list, filter_image_list):
                     Model_Interfaces.db2_add_one_ori_news(dateutil.parser.parse(times), str(title), str(content), str(summary), str(z), str(url), str(image))
     except Exception as e:
@@ -422,6 +380,7 @@ def add_history_processing(history_days):
 
 
 @shared_task
+# dynamic cluster in one topic news
 def one_topic_news_dynamic_cluster_flow(topic):
     try:
         if topic is None:

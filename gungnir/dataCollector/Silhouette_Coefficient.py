@@ -16,7 +16,7 @@ import logging
 django.setup()
 logger = logging.getLogger('dataCollector')
 
-
+# Use pca reduce dimension
 def draw_all_news(self, X):
     pca = PCA(n_components=2).fit(X)
     pca_result2D = pca.transform(X)
@@ -24,6 +24,7 @@ def draw_all_news(self, X):
     plt.show()
 
 class S_C:
+    # Compute Silhouette Coefficient
     def compute_K(self, X):
         dict1 = {}
         min_K_num = 2
@@ -41,6 +42,7 @@ class S_C:
             #logger.debug("For n_clusters={}, The Silhouette Coefficient is {}".format(n_cluster, sil_coeff))
         return dict1
 
+    # Compute elbow method base on variance explained
     def compute_K_elbow(self, X):
         dict1 = {}
         pca = PCA(n_components=2).fit(X)
@@ -66,6 +68,7 @@ class S_C:
             index = index + 1
         return dict1
 
+    # compute elbow method base on mean distortion
     def elbow_mean_distortion(self, R2D):
         try:
             dict1 = {}
@@ -83,6 +86,7 @@ class S_C:
         except:
             return None
 
+    # According to Silhouette Coefficient choose K value
     def Choose_cluster_number(sc_dis):
         list_1 = sorted(sc_dis.items(), key=lambda item: item[1], reverse=True)
         h_sc = list_1[0]
@@ -97,6 +101,7 @@ class S_C:
         higher_score = h_sc[1]
         return cluster_number
 
+    # According to distance between point to line choose k value
     def Choose_cluster_number_distance(self, dict1):
         list_2 = sorted(dict1.items(), key=lambda item: item[0])
         point1 = Point(list_2[0])
@@ -116,6 +121,7 @@ class S_C:
         logger.info("Best K value is" + str(cluster_number))
         return cluster_number
 
+    # According to distance between point to line of linear regression choose k value
     def silh_coef_and_cluster_num_linear_regression(self, k_num_silh_coef_dict):
         if k_num_silh_coef_dict is None:
             return None

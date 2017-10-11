@@ -13,9 +13,8 @@ logger = logging.getLogger('dataCollector')
 
 
 class C_times:
+    # Identify the sequence between to datetime
     def Ctoday(self, times, last_time):
-        #last_time = "2008-09-26T01:51:42.000Z"
-        #time = "2008-09-26T01:53:42.000Z"
         try:
             latest = last_time
             now = times
@@ -28,6 +27,7 @@ class C_times:
             logger.error("Can not compare time, C_times.Ctoday failed: " + str(e))
             return 0
 
+    # Tranlate str to timestamp
     def str_to_timestamp(self, time_str):
         try:
             dt = dateutil.parser.parse(time_str)
@@ -36,6 +36,7 @@ class C_times:
             logger.error("C_times.str_to_timestamp: " + str(e))
             return None
 
+    # According to time stamp generate useful datetime form
     def parse_timestamp(self, timestamp):
         try:
             timeArray = time.localtime(timestamp)

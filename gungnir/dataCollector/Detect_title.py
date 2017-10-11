@@ -9,6 +9,7 @@ import logging
 logger = logging.getLogger('dataCollector')
 
 class title_:
+    # Tokenize function
     def tokenize_and_stem(text):
         stemmer = SnowballStemmer("english")
         # first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
@@ -21,6 +22,7 @@ class title_:
         stems = [stemmer.stem(t) for t in filtered_tokens]
         return stems
 
+    # Detect outliers according to the result of comparing topic and news tile and content
     def compare_title(self, title_list, topic, content_list):
         res_index = []
         index = 0

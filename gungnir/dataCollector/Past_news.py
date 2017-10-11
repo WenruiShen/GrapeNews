@@ -19,6 +19,7 @@ import logging
 logger = logging.getLogger('dataCollector')
 
 class ALL_news:
+    # NYT news extraction
     def NYT_news_search_get(self, query, page, start_date):
         try:
             q = query
@@ -34,7 +35,7 @@ class ALL_news:
             logger.error("NYT_news_search_get failed: " + str(e))
             return None, None, None, None, None, None
         
-    
+    # BBC news extraction
     def BBC_news_search_get(self, query, page, start_date):
         try:
             q = query
@@ -51,6 +52,7 @@ class ALL_news:
             logger.error("BBC_news_search_get failed: " + str(e))
             return None, None, None, None, None
 
+    # ABC news extraction
     def ABC_news_search_get(self, query, page, start_date):
         try:
             q = query
@@ -70,6 +72,7 @@ class ALL_news:
             logger.error("ABC_news_search_get failed: " + str(e))
             return None, None, None, None, None
 
+    # CNN news extraction
     def CNN_news_search_get(self, query, page, start_date):
         try:
             q = query

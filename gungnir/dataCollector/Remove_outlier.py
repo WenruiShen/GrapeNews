@@ -4,6 +4,7 @@ import logging
 logger = logging.getLogger('dataCollector')
 
 class R_outlier:
+    # Remove the cluster which only have one element
     def Remove_cluster_one(self, k_means_labels, k_value, centroids, sample_number):
         try:
             number_dic = {}
@@ -24,6 +25,7 @@ class R_outlier:
             logger.error("Remove_cluster_one" + str(e))
             return centroids
 
+    # Remove the news which cosine similarity > max(np.mean(sum_c) * 0.6, 0.01)
     def Remove_outlier_simi(self, cos_list):
         try:
             sum_cos = {}

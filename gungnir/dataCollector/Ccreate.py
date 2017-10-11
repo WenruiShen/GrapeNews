@@ -24,7 +24,7 @@ logger = logging.getLogger('dataCollector')
 
 
 class Medium:
-    # extract_news V2.0
+    # extract_news from given news url using newspaper library V2.0
     def extract_newsV2(self, newsurl_list_ori, newsdate_list_ori, start_date):
         nyt_img_list = ['https://static01.nyt.com/images/icons/t_logo_291_black.png', 'https://static01.nyt.com/images/common/icons/t_wb_75.gif']
         news_content_list = []
@@ -95,6 +95,7 @@ class NYT(Medium):
             logger.error("NYT.create_NYTURL_2 failed: " + str(e))
             return None
 
+    # Generate NYT search qury url
     def create_NYTURL_2_1(self, num_page, search_q):
         url_base = 'https://query.nytimes.com/svc/add/v1/sitesearch.json?sort=desc&fq=document_type%3A%22article%22&facet=true'
         search_p = {"q": search_q, "page": num_page}
@@ -110,7 +111,7 @@ class NYT(Medium):
             logger.error("NYT.create_NYTURL_2 failed: " + str(e))
             return None
 
-    # parse daily json response V1.0
+    # parse json response V1.0
     def parse_json(self, nyt_respone, lastes_date) :
         #NYT_Q = NYT_respone
         nyt_r = nyt_respone
@@ -129,25 +130,6 @@ class NYT(Medium):
         except Exception as e:
             logger.error("NYT.parse_json failed: " + str(e))
             return None, None
-    '''
-    #  parse history json response V1.0
-    def parse_past_json(self, nyt_respone) :
-        #NYT_Q = NYT_url
-        nyt_r = nyt_respone
-        nyt_data = nyt_r.json()
-        nyt_newsurl = []
-        nyt_newsdate = []
-        try:
-            if (len(nyt_data["response"])!=0):
-                nyt_articles = nyt_data["response"]["docs"]
-                for article in nyt_articles:
-                    nyt_newsurl.append(article['web_url'])
-                    nyt_newsdate.append(article['pub_date'])
-            return nyt_newsurl, nyt_newsdate
-        except Exception as e:
-            logger.error("NYT.parse_past_json failed: " + str(e))
-            return nyt_newsurl, nyt_newsdate
-    '''
 
 class BBC(Medium):
     # generate url V1.0
@@ -161,7 +143,7 @@ class BBC(Medium):
         arr = urlparse(url1)
         return urllib.parse.urlunparse((arr.scheme, arr.netloc, arr.path, arr.params, arr.query, arr.fragment))
 
-    # generate url request V2.0
+    # generate BBC search qury url request V2.0
     def create_URL_2(self, num_page,search_q):
         base = "http://www.bbc.co.uk/search/"
         b1 = "more?page="
@@ -274,7 +256,8 @@ class ABC(Medium):
         except Exception as e:
             logger.error("ABC.create_URL failed: " + str(e))
             return None
-    # create abc search engine url
+
+    # create ABC search engine qury url
     def create_URL2(self, num_page, search_q):
         try:
             base = "http://abcnews.go.com/meta/javascript/loadmarkup?include=%2Fmeta%2Fsearch%2Fresults%3Fsearchtext%3D"
@@ -346,7 +329,8 @@ class ABC(Medium):
         except Exception as e:
             logger.error("ABC.extract_pubtime failed: " + str(e))
             return None
-    ## Combine publish date and news url V1.0
+
+    # Combine publish date and news url V1.0
     def extract_pubtime_newsurl(self, content):
         C = dataCollector.Ctime.C_times()
         urllist = []
@@ -392,6 +376,7 @@ class CNN(Medium):
             logger.error("CNN.create_URL2 failed: " + str(e))
             return None
 
+    # parse json response V1.0
     def parse_json_CNN(self, cnn_respone, lastes_date):
         url_list = []
         time_list = []

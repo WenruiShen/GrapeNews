@@ -16,6 +16,7 @@ import logging
 logger = logging.getLogger('dataCollector')
 
 class Cosine_similarity:
+    # Tokenizer function
     def lemma_tokenizer_v2(ori_news_list):
         # use the standard scikit-learn tokenizer first
         standard_tokenizer = CountVectorizer().build_tokenizer()
@@ -30,6 +31,7 @@ class Cosine_similarity:
                     lemma_tokens.append(lemma_token)
         return lemma_tokens
 
+    # Compute cosine similarity between each news content and keep part of them
     def comput_cosine_similarity(self, news_obj_list):
         try:
             news_documents = []

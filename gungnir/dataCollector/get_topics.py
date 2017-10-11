@@ -10,6 +10,7 @@ import logging
 
 logger = logging.getLogger('dataCollector')
 
+# Generate the n day date
 def get_date_n_day_before(n_days):
     n_days_hours = -24 * n_days
     day_n = arrow.now().replace(hours=n_days_hours).format('DD')
@@ -33,10 +34,17 @@ def isapostrophe(s):
 
 class topics:
     # Organize topics' usls.
+
     def url_organizer(year, month, day):
         url_head = url0 = "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&titles=Portal%3ACurrent+events%2F"
-        url_tail = "&rvprop=content&rvparse=1"
+        #url_tail = "&rvprop=content&rvparse=1"
+        url_tail = "&rvprop=content"
         url = url_head + str(year) + "+" + str(month) + "+" + str(day) + url_tail
+        return url
+
+    def url_organizer_v2(year, month, day):
+        url_head = url0 = "https://en.wikipedia.org/wiki/Portal:Current_events/"
+        url = url_head + str(year) + "_" + str(month) + "_" + str(day)
         return url
 
     # get response from wikipedia Current event V2.0
@@ -45,7 +53,8 @@ class topics:
         logger.info("Get hot Wiki topics [" + str(N_day) + "] days ago.")
         year, month, day = get_date_n_day_before(N_day)
         # generate dynamic url
-        url = topics.url_organizer(year, month, day)
+        #url = topics.url_organizer(year, month, day)
+        url = topics.url_organizer_v2(year, month, day)
         try:
             raw_json_list = []
             response = urllib.request.urlopen(url)
@@ -57,6 +66,9 @@ class topics:
             return None
         except URLError as e:
             logger.error("We failed to reach a server: " + str(e.reason))
+            return None
+        except Exception as e:
+            logger.error("get_response() Error: " + str(e))
             return None
 
     # parse json to get topic V2.0
@@ -102,6 +114,48 @@ class topics:
                 html = raw_data["query"]["pages"][pageid]["revisions"][0]["*"]
                 parser = bs4.BeautifulSoup(html,'html.parser')
                 for b1 in parser.find_all('td', class_='description'):
+                    for ul in b1.find_all('ul'):
+                        for li in ul.find_all('li'):
+                            if len(li.contents) > 0:
+                                if getattr(li.contents[0], 'name', None) == 'a':
+                                    titles.append(li.contents[0].text)
+                for title in titles:
+                    title_words = []
+                    a1 = re.compile(r'\([^}]*\)') #remove string in brackets
+                    re_title = a1.sub('', title)
+                    clean_title = remove.removePunctuation(re_title)
+                    #clean_title = remove.removestopword(f_title)
+                    if clean_title is None:
+                        continue
+                    if len(clean_title.split()) >= 2:
+                        for i in clean_title.split():
+                            if i.isalpha() or ishypen(i) or isapostrophe(i) or not (i.isalpha() or i.isdigit()) and i.isalnum():
+                                title_words.append(i)
+                            topic = ' '.join(title_words)
+                        if topic not in topics:
+                            if len(topics) == 0:
+                                topics.append(topic)
+                                continue
+                            clean_topic = remove.removestopword(topic)
+                            if list_overlap(clean_topic.split(), topics[-1].split()) is False:
+                                topics.append(topic)
+                                clean_topics.append(clean_topic)
+            #logger.debug(topics)
+            return topics
+        except Exception as e:
+            logger.error("pares_raw_data_2() get topic from wiki error: " + str(e))
+            return None
+
+    # parse json to get topic V3.0
+    def pares_raw_data_3(self, raw_html_list):
+        try:
+            topics = []
+            clean_topics = []
+            titles = []
+            for raw_json in raw_html_list:
+                remove = dataCollector.remove_Punctuation.Remove()
+                parser = bs4.BeautifulSoup(raw_json,'html.parser')
+                for b1 in parser.find_all(class_='description'):
                     for ul in b1.find_all('ul'):
                         for li in ul.find_all('li'):
                             if len(li.contents) > 0:
