@@ -40,7 +40,7 @@ olefile==0.44
 onboard==1.2.0
 padme==1.1.1
 pexpect==4.0.1
-Pillow==4.1.1
+Pillow==8.1.1
 plainbox==0.25
 psycopg2==2.7.1
 ptyprocess==0.5
