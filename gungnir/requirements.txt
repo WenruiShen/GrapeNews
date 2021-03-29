@@ -25,7 +25,7 @@ packaging==16.8
 pandas==0.20.1
 Pillow==4.1.1
 psycopg2==2.7.1
-Pygments==2.2.0
+Pygments==2.7.4
 pyparsing==2.2.0
 python-dateutil==2.6.0
 pytrends==4.1.1
