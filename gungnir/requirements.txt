@@ -16,7 +16,7 @@ feedparser==5.2.1
 idna==2.5
 jieba3k==0.35.1
 kombu==3.0.37
-lxml==3.7.3
+lxml==4.6.5
 newspaper3k==0.2.2
 nltk==3.2.4
 numpy==1.12.1
